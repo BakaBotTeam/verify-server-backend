@@ -1,0 +1,1 @@
+rootProject.name = "ltd.guimc.verify.server.verifyserver"
