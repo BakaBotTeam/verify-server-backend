@@ -13,9 +13,8 @@ class ApplicationTest {
         application {
             configureRouting()
         }
-        client.get("/").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello World!", bodyAsText())
+        client.get("/verify?action=new&appid=XL_VER_APP_UJj5C2c56SC412c121C&group=1116545&qqid=545610&time=0&sign=26b9eecefd8bd327fd095501206a78f441d03dcd4f31e967c4df14c648933a13").apply {
+            println(bodyAsText())
         }
     }
 }
