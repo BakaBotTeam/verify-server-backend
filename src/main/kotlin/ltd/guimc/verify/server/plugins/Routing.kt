@@ -1,10 +1,11 @@
 package ltd.guimc.verify.server.plugins
 
 import HashUtils.sha256
-import io.ktor.http.*
-import io.ktor.server.routing.*
-import io.ktor.server.response.*
 import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.json.JsonObject
+import ltd.guimc.verify.server.utils.JsonUtils.respondFailedAuth
 
 fun Application.configureRouting() {
     routing {
@@ -28,12 +29,11 @@ fun Application.configureRouting() {
                     val clientTime = parm["time"]!!.toLong()
                     val sign = parm["sign"]!!
 
-                    // if (System.currentTimeMillis() - clientTime >= 5000) {
-                    //     call.respondText("{\"success\":false, \"reason\":\"TimeProblem\"}")
-                    //     call.response.status(HttpStatusCode.Unauthorized)
-                    // }
+                    val responseContext = JsonObject
 
-                    call.respondText("$appid:${appid.sha256()}:$group:$qqid:$clientTime".sha256())
+                    if (System.currentTimeMillis() - clientTime >= 5000 && "$appid:${appid.sha256()}:$group:$qqid:$clientTime".sha256() != sign) {
+                        call.respondFailedAuth()
+                    }
                 }
 
                 "do" -> {
