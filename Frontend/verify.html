@@ -1,0 +1,30 @@
+<html>
+<head>
+    <script src="https://js.hcaptcha.com/1/api.js?hl=zh-CN" async defer></script>
+    <script>
+        function ckhswa() {
+            hcaptcha.render('captcha-1', {
+                sitekey: 'f5612471-2623-4b8b-b30d-dce43b9f0f98',
+                theme: 'lighy',
+                'error-callback': 'onError',
+            });
+            hcaptcha.execute({ async: true })
+                .then(({ response, key }) => {
+                    console.log(response, key);
+                    window.location.href="/verify?action=do&token="+response;
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
+    </script>
+</head>
+<body>
+<div id="tips-text" class="tips-text">
+    <button onclick="ckhswa()">
+        Click button to finish hCaptcha verify.
+    </button>
+</div>
+<div id="captcha-1" class="captcha-1"></div>
+</body>
+</html>

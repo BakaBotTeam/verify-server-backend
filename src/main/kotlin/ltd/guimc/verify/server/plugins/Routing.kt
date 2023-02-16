@@ -6,6 +6,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.JsonObject
 import ltd.guimc.verify.server.utils.JsonUtils.respondFailedAuth
+import ltd.guimc.verify.server.utils.hcaptchaUtils
+import java.io.File
 
 fun Application.configureRouting() {
     routing {
@@ -37,7 +39,11 @@ fun Application.configureRouting() {
                 }
 
                 "do" -> {
-                    // call.respondText("ur trying verify")
+                    call.respondText(if (this.context.request.queryParameters["token"]?.let { it1 ->
+                            hcaptchaUtils.verifyToken(
+                                it1
+                            )
+                        } == true) "Success Verify" else "Failed Verify")
                 }
 
                 "status" -> {
@@ -45,7 +51,7 @@ fun Application.configureRouting() {
                 }
 
                 else -> {
-                    call.respondText("???")
+                    call.respondFile(File("Frontend/verify.html"))
                 }
             }
         }
