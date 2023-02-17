@@ -6,7 +6,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.JsonObject
 import ltd.guimc.verify.server.utils.JsonUtils.respondFailedAuth
-import ltd.guimc.verify.server.utils.hcaptchaUtils
+import ltd.guimc.verify.server.utils.HCaptchaUtils
 import java.io.File
 
 fun Application.configureRouting() {
@@ -36,11 +36,13 @@ fun Application.configureRouting() {
                     if (System.currentTimeMillis() - clientTime >= 5000 && "$appid:${appid.sha256()}:$group:$qqid:$clientTime".sha256() != sign) {
                         call.respondFailedAuth()
                     }
+
+                    call.respondText("{\"success\":true, \"session\":\"Unauthorized\"}")
                 }
 
                 "do" -> {
                     call.respondText(if (this.context.request.queryParameters["token"]?.let { it1 ->
-                            hcaptchaUtils.verifyToken(
+                            HCaptchaUtils.verifyToken(
                                 it1
                             )
                         } == true) "Success Verify" else "Failed Verify")

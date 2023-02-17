@@ -4,8 +4,8 @@
     <script>
         function ckhswa() {
             hcaptcha.render('captcha-1', {
-                sitekey: 'f5612471-2623-4b8b-b30d-dce43b9f0f98',
-                theme: 'lighy',
+                sitekey: '10000000-ffff-ffff-ffff-000000000001',
+                theme: 'light',
                 'error-callback': 'onError',
             });
             hcaptcha.execute({ async: true })
@@ -17,6 +17,17 @@
                     console.error(err);
                 });
         }
+
+        function getQueryVariable(variable){
+             let query = window.location.search.substring(1);
+             let vars = query.split("&");
+             for (let i=0;i<vars.length;i++) {
+                     let pair = vars[i].split("=");
+                     if(pair[0] == variable){return pair[1];}
+             }
+             return(false);
+        }
+
     </script>
 </head>
 <body>
