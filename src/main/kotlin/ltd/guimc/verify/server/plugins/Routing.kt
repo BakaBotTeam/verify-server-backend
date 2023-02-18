@@ -4,9 +4,9 @@ import HashUtils.sha256
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.JsonObject
-import ltd.guimc.verify.server.utils.JsonUtils.respondFailedAuth
+import ltd.guimc.verify.server.utils.AuthUtils
 import ltd.guimc.verify.server.utils.HCaptchaUtils
+import ltd.guimc.verify.server.utils.JsonUtils.respondFailedAuth
 import ltd.guimc.verify.server.utils.SessionUtils
 import java.io.File
 
@@ -20,11 +20,15 @@ fun Application.configureRouting() {
             val parm = this.context.request.queryParameters
             when (parm["action"]) {
                 "new" -> {
-                    checkNotNull(parm["appid"])
-                    checkNotNull(parm["qqid"])
-                    checkNotNull(parm["group"])
-                    checkNotNull(parm["time"])
-                    checkNotNull(parm["sign"])
+                    try {
+                        checkNotNull(parm["appid"])
+                        checkNotNull(parm["qqid"])
+                        checkNotNull(parm["group"])
+                        checkNotNull(parm["time"])
+                        checkNotNull(parm["sign"])
+                    } catch (_: IllegalStateException) {
+                        call.respondFailedAuth()
+                    }
 
                     val appid = parm["appid"]!!
                     val qqid = parm["qqid"]!!
@@ -32,9 +36,9 @@ fun Application.configureRouting() {
                     val clientTime = parm["time"]!!.toLong()
                     val sign = parm["sign"]!!
 
-                    // if (System.currentTimeMillis() - clientTime >= 5000 && "$appid:${appid.sha256()}:$group:$qqid:$clientTime".sha256() != sign) {
-                    //     call.respondFailedAuth()
-                    // }
+                    if (System.currentTimeMillis() - clientTime >= 5000 && "$appid:${AuthUtils.getSecret(appid)}:$group:$qqid:$clientTime".sha256() != sign) {
+                        call.respondFailedAuth()
+                    }
 
                     call.respondText("{\"success\":true, \"session\":\"${SessionUtils.newSession()}\"}")
                 }
@@ -56,11 +60,11 @@ fun Application.configureRouting() {
 
                 "status" -> {
                     if (SessionUtils.findSucceedSession(this.context.request.queryParameters["session"]!!)) {
-                        call.respondText("{\"success\":true, \"reason\":\"\"}")
+                        call.respondText("{\"success\":true, \"timeout\":false}")
                     } else if (SessionUtils.findTimedoutSession(this.context.request.queryParameters["session"]!!)) {
                         call.respondText("{\"success\":false, \"timeout\":true}")
                     } else {
-                        call.respondText("{\"success\":false, \"reason\":\"\"}")
+                        call.respondText("{\"success\":false, \"timeout\":false}")
                     }
                 }
 

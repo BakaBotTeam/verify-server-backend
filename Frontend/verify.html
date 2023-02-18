@@ -1,17 +1,20 @@
-<html>
+<!DOCTYPE html>
+<html lang="en-US">
 <head>
     <script src="https://js.hcaptcha.com/1/api.js?hl=zh-CN" async defer></script>
     <script>
         function ckhswa() {
+            document.getElementById("tips-text").childNodes[1].disabled = true;
+            document.getElementById("tips-text").childNodes[1].innerText = "Please Wait...";
             hcaptcha.render('captcha-1', {
                 sitekey: 'f5612471-2623-4b8b-b30d-dce43b9f0f98',
                 theme: 'light',
                 'error-callback': 'onError',
             });
-            hcaptcha.execute({ async: true })
-                .then(({ response, key }) => {
+            hcaptcha.execute({async: true})
+                .then(({response, key}) => {
                     console.log(response, key);
-                    window.location.href="/verify?action=do&token="+response+"&session="+getQueryVariable("session");
+                    window.location.href = "/verify?action=do&token=" + response + "&session=" + getQueryVariable("session");
                 })
                 .catch(err => {
                     console.error(err);
@@ -23,19 +26,25 @@
              let vars = query.split("&");
              for (let i=0;i<vars.length;i++) {
                      let pair = vars[i].split("=");
-                     if(pair[0] == variable){return pair[1];}
+                 if (pair[0] === variable) {
+                     return pair[1];
+                 }
              }
-             return(false);
+            return false;
         }
 
     </script>
+    <title>Captcha Page</title>
 </head>
 <body>
-<div id="tips-text" class="tips-text">
+<div class="title tips-text" id="tips-text">
     <button onclick="ckhswa()">
         Click button to finish hCaptcha verify.
     </button>
 </div>
-<div id="captcha-1" class="captcha-1", style="display: none; visibility: hidden;"></div>
+<div class="subTitle tips-text" id="tips-text2">
+
+</div>
+<div class="captcha-1" id="captcha-1" style="display: none; visibility: hidden;"></div>
 </body>
 </html>

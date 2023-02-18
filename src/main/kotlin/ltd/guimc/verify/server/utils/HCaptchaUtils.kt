@@ -2,7 +2,6 @@ package ltd.guimc.verify.server.utils
 
 import java.io.BufferedReader
 import java.io.DataOutputStream
-import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URL
 
@@ -13,7 +12,7 @@ object HCaptchaUtils {
 
     fun verifyToken(string: String): Boolean {
         val url = URL("https://hcaptcha.com/siteverify")
-        val postData = "response=$string&secret=$secretKey&"
+        val postData = "response=$string&secret=$secretKey&sitekey=$siteKey"
         var response = ""
 
         val conn = url.openConnection()

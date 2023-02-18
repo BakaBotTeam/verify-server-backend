@@ -9,6 +9,7 @@ plugins {
 
 group = "ltd.guimc.verify.server"
 version = "0.0.1"
+
 application {
     mainClass.set("ltd.guimc.verify.server.ApplicationKt")
 
