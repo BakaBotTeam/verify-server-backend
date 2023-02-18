@@ -1,11 +1,11 @@
 package ltd.guimc.verify.server.plugins
 
-import HashUtils.sha256
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ltd.guimc.verify.server.utils.AuthUtils
 import ltd.guimc.verify.server.utils.HCaptchaUtils
+import ltd.guimc.verify.server.utils.HashUtils.sha256
 import ltd.guimc.verify.server.utils.JsonUtils.respondFailedAuth
 import ltd.guimc.verify.server.utils.SessionUtils
 import java.io.File

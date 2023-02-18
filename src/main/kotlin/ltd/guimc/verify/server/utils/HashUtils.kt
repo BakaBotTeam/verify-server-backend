@@ -1,3 +1,5 @@
+package ltd.guimc.verify.server.utils
+
 import java.math.BigInteger
 import java.security.MessageDigest
 
