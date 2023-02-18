@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.json.JsonObject
 import ltd.guimc.verify.server.utils.JsonUtils.respondFailedAuth
 import ltd.guimc.verify.server.utils.HCaptchaUtils
+import ltd.guimc.verify.server.utils.SessionUtils
 import java.io.File
 
 fun Application.configureRouting() {
@@ -31,29 +32,44 @@ fun Application.configureRouting() {
                     val clientTime = parm["time"]!!.toLong()
                     val sign = parm["sign"]!!
 
-                    val responseContext = JsonObject
+                    // if (System.currentTimeMillis() - clientTime >= 5000 && "$appid:${appid.sha256()}:$group:$qqid:$clientTime".sha256() != sign) {
+                    //     call.respondFailedAuth()
+                    // }
 
-                    if (System.currentTimeMillis() - clientTime >= 5000 && "$appid:${appid.sha256()}:$group:$qqid:$clientTime".sha256() != sign) {
-                        call.respondFailedAuth()
-                    }
-
-                    call.respondText("{\"success\":true, \"session\":\"Unauthorized\"}")
+                    call.respondText("{\"success\":true, \"session\":\"${SessionUtils.newSession()}\"}")
                 }
 
                 "do" -> {
-                    call.respondText(if (this.context.request.queryParameters["token"]?.let { it1 ->
+                    //
+                    if (this.context.request.queryParameters["token"]?.let { it1 ->
                             HCaptchaUtils.verifyToken(
                                 it1
                             )
-                        } == true) "Success Verify" else "Failed Verify")
+                        } == true && SessionUtils.findSession(this.context.request.queryParameters["session"]!!)) {
+                        SessionUtils.finishSession(this.context.request.queryParameters["session"]!!)
+                        call.respondText("Success Verify")
+                    } else {
+                        call.respondText("Failed Verify or Cannot find session")
+                    }
+
                 }
 
                 "status" -> {
-                    // call.respondText("ur trying get status")
+                    if (SessionUtils.findSucceedSession(this.context.request.queryParameters["session"]!!)) {
+                        call.respondText("{\"success\":true, \"reason\":\"\"}")
+                    } else if (SessionUtils.findTimedoutSession(this.context.request.queryParameters["session"]!!)) {
+                        call.respondText("{\"success\":false, \"timeout\":true}")
+                    } else {
+                        call.respondText("{\"success\":false, \"reason\":\"\"}")
+                    }
                 }
 
                 else -> {
-                    call.respondFile(File("Frontend/verify.html"))
+                    if (SessionUtils.findSession(this.context.request.queryParameters["session"]!!)) {
+                        call.respondFile(File("Frontend/verify.html"))
+                    } else {
+                        call.respondText("Cannot find session")
+                    }
                 }
             }
         }

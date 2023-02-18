@@ -1,6 +1,10 @@
 package ltd.guimc.verify.server.utils
 
+import java.io.BufferedReader
+import java.io.DataOutputStream
 import java.io.IOException
+import java.io.InputStreamReader
+import java.net.URL
 
 
 object HCaptchaUtils {
@@ -8,25 +12,24 @@ object HCaptchaUtils {
     private const val secretKey = "0x9EE2fcac438B199cCbC327fe8f5FB1c92AaB4eA8"
 
     fun verifyToken(string: String): Boolean {
-        // form parameters
-        // form parameters
-        val formBody: RequestBody = Builder()
-            .add("id", 10)
-            .build()
+        val url = URL("https://hcaptcha.com/siteverify")
+        val postData = "response=$string&secret=$secretKey&"
+        var response = ""
 
-        val request: Request = Builder()
-            .url("http://www.example.com/page.php")
-            .post(formBody)
-            .build()
+        val conn = url.openConnection()
+        conn.doOutput = true
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
+        conn.setRequestProperty("Content-Length", postData.length.toString())
 
-
-        val httpClient = OkHttpClient()
-
-        httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful()) throw IOException("Unexpected code $response")
-
-            // Get response body
-            System.out.println(response.body().string())
+        DataOutputStream(conn.getOutputStream()).use { it.writeBytes(postData) }
+        BufferedReader(InputStreamReader(conn.getInputStream())).use { bf ->
+            var line: String?
+            while (bf.readLine().also { line = it } != null) {
+                response += line
+            }
         }
+
+        println(response)
+        return response.indexOf("\"success\":true") != -1
     }
 }

@@ -4,14 +4,14 @@
     <script>
         function ckhswa() {
             hcaptcha.render('captcha-1', {
-                sitekey: '10000000-ffff-ffff-ffff-000000000001',
+                sitekey: 'f5612471-2623-4b8b-b30d-dce43b9f0f98',
                 theme: 'light',
                 'error-callback': 'onError',
             });
             hcaptcha.execute({ async: true })
                 .then(({ response, key }) => {
                     console.log(response, key);
-                    window.location.href="/verify?action=do&token="+response;
+                    window.location.href="/verify?action=do&token="+response+"&session="+getQueryVariable("session");
                 })
                 .catch(err => {
                     console.error(err);
@@ -36,6 +36,6 @@
         Click button to finish hCaptcha verify.
     </button>
 </div>
-<div id="captcha-1" class="captcha-1"></div>
+<div id="captcha-1" class="captcha-1", style="display: none; visibility: hidden;"></div>
 </body>
 </html>
